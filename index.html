@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProQuiz Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0B0F19;
+            --card-dark: #111827;
+            --border: #1E293B;
+            --accent: #F59E0B;
+            --accent-light: #FCD34D;
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(17, 24, 39, 0.75);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        
+        /* AUTH PAGE PREMIUM LAYOUT */
+        .auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at 20% 50%, #1E293B 0%, #0B0F19 60%); position: relative; overflow: hidden; }
+        .auth-wrapper::before { content: ''; position: absolute; top: -30%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%); border-radius: 50%; z-index: 0; }
+        .auth-container { display: flex; width: 100%; max-width: 950px; background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.5); z-index: 1; animation: enterAuth 0.8s ease; }
+        @keyframes enterAuth { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .auth-left { flex: 1.1; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(17,24,39,0.9)); padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border); }
+        .auth-left h1 { font-family: 'Cinzel', serif; font-size: 2.4em; color: var(--accent); margin-bottom: 15px; line-height: 1.2; }
+        .auth-left p { color: var(--text-muted); font-size: 1.05em; line-height: 1.6; margin-bottom: 30px; }
+        .auth-features { list-style: none; }
+        .auth-features li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; }
+        .auth-features li i { color: var(--accent); }
+        .auth-right { flex: 1; padding: 45px 40px; display: flex; flex-direction: column; justify-content: center; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text); font-size: 0.9em; }
+        .input-icon { position: absolute; left: 14px; top: 42px; color: var(--text-muted); font-size: 1em; }
+        input { width: 100%; padding: 14px 14px 14px 42px; background: var(--card-dark); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 15px; transition: all 0.3s; }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+        .pro-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #B45309); color: #0B0F19; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; margin-top: 10px; }
+        .pro-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(245,158,11,0.3); }
+        .pro-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
+        .pro-btn:hover::after { left: 100%; }
+        .toggle-link { text-align: center; margin-top: 25px; color: var(--accent); cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .toggle-link:hover { color: var(--accent-light); text-decoration: underline; }
+        .error { background: rgba(239,68,68,0.15); color: var(--danger); padding: 12px; border-radius: 10px; margin-bottom: 20px; text-align: center; border: 1px solid rgba(239,68,68,0.3); animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        
+        /* REST OF THE APP */
+        .full-screen { width: 100%; min-height: 100vh; background: var(--bg-dark); }
+        .header { background: var(--card-dark); border-bottom: 1px solid var(--border); padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .header h1 { font-family: 'Cinzel', serif; font-size: 1.6em; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .header-nav { display: flex; gap: 12px; flex-wrap: wrap; }
+        .header-nav a { color: var(--text-muted); text-decoration: none; padding: 10px 18px; border-radius: 10px; background: var(--bg-dark); border: 1px solid var(--border); transition: all 0.3s; font-weight: 500; font-size: 0.9em; }
+        .header-nav a:hover, .header-nav a.active { background: rgba(245,158,11,0.1); border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        .main-content { padding: 35px; max-width: 1300px; margin: 0 auto; animation: fadeIn 0.6s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .welcome-banner { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(17,24,39,0.8)); border: 1px solid var(--border); border-radius: 20px; padding: 35px; margin-bottom: 35px; position: relative; overflow: hidden; }
+        .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%); border-radius: 50%; }
+        .welcome-banner h2 { font-family: 'Cinzel', serif; font-size: 1.8em; color: var(--accent); margin-bottom: 10px; position: relative; }
+        .welcome-banner p { color: var(--text-muted); position: relative; }
+        .section-title { font-family: 'Cinzel', serif; font-size: 1.4em; color: var(--text); margin: 30px 0 20px; display: flex; align-items: center; gap: 10px; }
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin: 25px 0; }
+        .category-card { background: var(--card-dark); border: 1px solid var(--border); border-radius: 18px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
+        .category-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .category-card i { font-size: 2.8em; color: var(--accent); margin-bottom: 15px; transition: transform 0.3s; }
+        .category-card:hover i { transform: rotate(8deg) scale(1.1); }
+        .category-card h3 { color: var(--text); font-size: 1.2em; margin-bottom: 8px; }
+        .category-card p { color: var(--text-muted); font-size: 0.85em; margin-bottom: 15px; }
+        .category-card .badge-count { display: inline-block; background: rgba(245,158,11,0.15); color: var(--accent); padding: 6px 14px; border-radius: 20px; font-size: 0.8em; font-weight: 600; border: 1px solid rgba(245,158,11,0.3); }
+        .difficulty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+        .difficulty-card { background: var(--card-dark); border: 1px solid var(--border); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .difficulty-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .difficulty-card.very-easy { border-left: 4px solid #10B981; }
+        .difficulty-card.easy { border-left: 4px solid #3B82F6; }
+        .difficulty-card.medium { border-left: 4px solid #F59E0B; }
+        .difficulty-card.hard { border-left: 4px solid #EF4444; }
+        .difficulty-card h3 { font-size: 1.3em; margin-bottom: 8px; }
+        .difficulty-card p { color: var(--text-muted); font-size: 0.85em; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 25px 0; }
+        .stat-card { background: var(--card-dark); border: 1px solid var(--border); padding: 25px; border-radius: 16px; text-align: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .stat-card i { font-size: 2em; color: var(--accent); margin-bottom: 12px; }
+        .stat-card h3 { font-size: 1.8em; color: var(--text); margin-bottom: 5px; }
+        .stat-card p { color: var(--text-muted); font-size: 0.9em; }
+        .table-container { background: var(--card-dark); border: 1px solid var(--border); border-radius: 16px; padding: 25px; margin: 25px 0; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: rgba(245,158,11,0.1); color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.5px; }
+        .data-table tr:hover { background: rgba(245,158,11,0.05); }
+        .progress-bar { background: var(--border); border-radius: 8px; height: 8px; margin: 8px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 8px; transition: width 1s ease; }
+        .material-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; margin: 25px 0; }
+        .material-category { background: var(--card-dark); border: 1px solid var(--border); border-radius: 16px; padding: 25px; transition: all 0.3s; }
+        .material-category:hover { border-color: var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .material-category h3 { color: var(--accent); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); font-family: 'Cinzel', serif; }
+        .material-item { display: flex; align-items: center; padding: 12px; margin: 8px 0; background: var(--bg-dark); border-radius: 10px; transition: all 0.3s; cursor: pointer; border: 1px solid transparent; }
+        .material-item:hover { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); transform: translateX(5px); }
+        .material-item i { margin-right: 12px; color: var(--accent); font-size: 1.1em; }
+        .leaderboard-item { display: flex; align-items: center; padding: 18px; margin: 12px 0; background: var(--card-dark); border: 1px solid var(--border); border-radius: 14px; transition: all 0.3s; }
+        .leaderboard-item:hover { transform: translateX(8px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .leaderboard-item.top-3 { background: linear-gradient(135deg, rgba(245,158,11,0.1), var(--card-dark)); border-color: var(--accent); }
+        .rank { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-dark); color: var(--text); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2em; margin-right: 18px; border: 2px solid var(--border); }
+        .rank.gold { background: linear-gradient(135deg, #F59E0B, #FCD34D); color: #0B0F19; border-color: #F59E0B; }
+        .rank.silver { background: linear-gradient(135deg, #94A3B8, #CBD5E1); color: #0B0F19; border-color: #94A3B8; }
+        .rank.bronze { background: linear-gradient(135deg, #B45309, #D97706); color: #0B0F19; border-color: #B45309; }
+        .user-info { flex: 1; }
+        .user-info h4 { color: var(--text); margin-bottom: 4px; }
+        .user-info p { color: var(--text-muted); font-size: 0.85em; }
+        .score-badge { background: rgba(16,185,129,0.15); color: var(--success); padding: 8px 16px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(16,185,129,0.3); }
+        .timer { position: fixed; top: 90px; right: 30px; background: var(--card-dark); border: 1px solid var(--border); padding: 14px 22px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.4); font-weight: 700; font-size: 1.1em; color: var(--accent); z-index: 1000; }
+        .timer.warning { color: var(--danger); animation: pulse 1s infinite; border-color: var(--danger); }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)} 50%{box-shadow:0 0 0 10px rgba(239,68,68,0)} }
+        .question-card { background: var(--card-dark); border: 1px solid var(--border); border-radius: 16px; padding: 25px; margin-bottom: 22px; border-left: 4px solid var(--accent); transition: all 0.3s; animation: slideUp 0.5s ease; animation-fill-mode: both; }
+        .question-card:nth-child(1){animation-delay:0.1s} .question-card:nth-child(2){animation-delay:0.2s} .question-card:nth-child(3){animation-delay:0.3s}
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .question-card h3 { color: var(--text); margin-bottom: 18px; font-size: 1.15em; line-height: 1.5; }
+        .diff-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.7em; font-weight: 700; margin-left: 10px; text-transform: uppercase; }
+        .diff-badge.very-easy{background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)}
+        .diff-badge.easy{background:rgba(59,130,246,0.15);color:#3B82F6;border:1px solid rgba(59,130,246,0.3)}
+        .diff-badge.medium{background:rgba(245,158,11,0.15);color:#F59E0B;border:1px solid rgba(245,158,11,0.3)}
+        .diff-badge.hard{background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3)}
+        .options label { display: block; padding: 14px 18px; margin: 8px 0; background: var(--bg-dark); border-radius: 10px; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border); }
+        .options label:hover { background: rgba(245,158,11,0.1); border-color: var(--accent); transform: translateX(5px); }
+        .options input[type="radio"] { margin-right: 10px; accent-color: var(--accent); }
+        .result-container { max-width: 650px; margin: 40px auto; text-align: center; padding: 30px; }
+        .result-circle { width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #B45309); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 35px auto; color: #0B0F19; box-shadow: 0 15px 35px rgba(245,158,11,0.3); animation: scaleIn 0.6s ease; }
+        @keyframes scaleIn { from{transform:scale(0)} 50%{transform:scale(1.1)} to{transform:scale(1)} }
+        .result-circle .score { font-size: 3.5em; font-weight: 800; }
+        .result-circle .total { font-size: 1.2em; opacity: 0.9; }
+        .grade-badge { font-size: 1.8em; font-weight: 800; padding: 18px 35px; border-radius: 14px; display: inline-block; margin: 25px 0; }
+        .grade-badge.excellent{background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)}
+        .grade-badge.good{background:rgba(245,158,11,0.15);color:#F59E0B;border:1px solid rgba(245,158,11,0.3)}
+        .grade-badge.average{background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3)}
+        .certificate-container { max-width: 750px; margin: 40px auto; background: linear-gradient(135deg, #0B0F19, #111827); border: 3px solid var(--accent); border-radius: 20px; padding: 50px 35px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 1s ease; position: relative; }
+        .certificate-container::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(245,158,11,0.3); border-radius: 14px; pointer-events: none; }
+        .certificate-header { font-size: 2.5em; color: var(--accent); margin-bottom: 15px; font-family: 'Cinzel', serif; }
+        .certificate-title { font-size: 1.8em; color: var(--text); margin-bottom: 25px; font-family: 'Cinzel', serif; }
+        .certificate-body { font-size: 1.1em; color: var(--text-muted); margin: 25px 0; line-height: 1.7; }
+        .certificate-name { font-size: 2.2em; color: var(--accent); font-weight: 700; margin: 25px 0; border-bottom: 2px solid var(--accent); display: inline-block; padding: 8px 35px; font-family: 'Cinzel', serif; }
+        .certificate-score { font-size: 1.4em; color: var(--success); font-weight: 700; margin: 25px 0; }
+        .certificate-date { margin-top: 35px; color: var(--text-muted); font-style: italic; }
+        .hidden { display: none !important; }
+        .logout-btn { color: var(--text-muted); text-decoration: none; padding: 10px 18px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 10px; font-weight: 600; transition: all 0.3s; }
+        .logout-btn:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); color: var(--danger); transform: translateY(-2px); }
+        @media (max-width: 850px) {
+            .auth-container { flex-direction: column; }
+            .auth-left { padding: 35px 30px; border-right: none; border-bottom: 1px solid var(--border); }
+            .auth-right { padding: 35px 30px; }
+        }
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; padding: 15px; }
+            .header-nav { flex-wrap: wrap; justify-content: center; }
+            .main-content { padding: 20px; }
+            .category-grid, .difficulty-grid { grid-template-columns: 1fr; }
+            .timer { top: auto; bottom: 20px; right: 20px; left: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    {% if page == 'login' or page == 'register' %}
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <div class="auth-left">
+                <h1>ProQuiz Platform</h1>
+                <p>Master your skills with structured assessments, real-time analytics, and certified achievements. Built for serious learners.</p>
+                <ul class="auth-features">
+                    <li><i class="fas fa-check-circle"></i> 250+ Curated Questions</li>
+                    <li><i class="fas fa-check-circle"></i> 4 Difficulty Levels</li>
+                    <li><i class="fas fa-check-circle"></i> Instant Performance Analytics</li>
+                    <li><i class="fas fa-check-circle"></i> Competitive Leaderboard</li>
+                    <li><i class="fas fa-check-circle"></i> Premium Certificates</li>
+                </ul>
+            </div>
+            <div class="auth-right">
+                {% if page == 'login' %}
+                <div id="login-form">
+                    {% if error %}<div class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>{% endif %}
+                    <form method="POST" action="/login">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="pro-btn"><i class="fas fa-sign-in-alt"></i> Access Dashboard</button>
+                    </form>
+                    <p class="toggle-link" onclick="toggleForm()"><i class="fas fa-user-plus"></i> New member? Join Now</p>
+                </div>
+                <div id="register-form" class="hidden">
+                    <form method="POST" action="/register">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" name="username" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="password" placeholder="Create password" required>
+                        </div>
+                        <button type="submit" class="pro-btn"><i class="fas fa-user-plus"></i> Create Pro Account</button>
+                    </form>
+                    <p class="toggle-link" onclick="toggleForm()"><i class="fas fa-sign-in-alt"></i> Already a member? Login</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="full-screen">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> ProQuiz Platform</h1>
+            <div class="header-nav">
+                <a href="/dashboard" class="{% if page == 'dashboard' %}active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/profile" class="{% if page == 'profile' %}active{% endif %}"><i class="fas fa-user"></i> Profile</a>
+                <a href="/leaderboard" class="{% if page == 'leaderboard' %}active{% endif %}"><i class="fas fa-trophy"></i> Leaderboard</a>
+                <a href="/study-materials" class="{% if page == 'materials' %}active{% endif %}"><i class="fas fa-book"></i> Resources</a>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+        <div class="main-content">
+            {% if page == 'dashboard' %}
+            <div class="welcome-banner">
+                <h2>Welcome back, {{ username }}! 👑</h2>
+                <p>Select your domain and difficulty to begin your assessment journey</p>
+            </div>
+            <h3 class="section-title"><i class="fas fa-th-large"></i> Choose Your Domain</h3>
+            <div class="category-grid">
+                <div class="category-card" onclick="goToDifficulty('All')"><i class="fas fa-random"></i><h3>Mixed Challenge</h3><p>All domains combined</p><span class="badge-count">Random 10</span></div>
+                <div class="category-card" onclick="goToDifficulty('Python')"><i class="fab fa-python"></i><h3>Python</h3><p>From basics to advanced</p><span class="badge-count">44 Questions</span></div>
+                <div class="category-card" onclick="goToDifficulty('Web Dev')"><i class="fas fa-code"></i><h3>Web Dev</h3><p>HTML, CSS, JS & more</p><span class="badge-count">42 Questions</span></div>
+                <div class="category-card" onclick="goToDifficulty('DBMS')"><i class="fas fa-database"></i><h3>DBMS</h3><p>SQL, Normalization, ACID</p><span class="badge-count">40 Questions</span></div>
+                <div class="category-card" onclick="goToDifficulty('Java')"><i class="fab fa-java"></i><h3>Java</h3><p>OOP, Collections, JVM</p><span class="badge-count">42 Questions</span></div>
+                <div class="category-card" onclick="goToDifficulty('Data Science')"><i class="fas fa-brain"></i><h3>Data Science</h3><p>ML, Pandas, EDA</p><span class="badge-count">40 Questions</span></div>
+                <div class="category-card" onclick="goToDifficulty('Networking')"><i class="fas fa-network-wired"></i><h3>Networking</h3><p>Protocols, OSI, Security</p><span class="badge-count">40 Questions</span></div>
+            </div>
+            <h3 class="section-title"><i class="fas fa-history"></i> Recent Attempts</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Domain</th><th>Difficulty</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Date</th><th>Action</th></tr></thead>
+                    <tbody>
+                        {% if results %}
+                            {% for r in results %}
+                            <tr>
+                                <td><strong>{{ r[2] }}</strong></td>
+                                <td><span class="diff-badge {{ r[3]|replace(' ', '-')|lower }}">{{ r[3] }}</span></td>
+                                <td>{{ r[0] }}/{{ r[1] }}</td>
+                                <td style="color: {% if r[4] >= 80 %}#10B981{% elif r[4] >= 60 %}#F59E0B{% else %}#EF4444{% endif %}; font-weight: 700;">{{ "%.1f"|format(r[4]) }}%</td>
+                                <td>{{ r[6] }}</td>
+                                <td>{{ r[5] }}</td>
+                                <td>{% if r[4] >= 80 %}<a href="/certificate/{{ r[0] }}" style="color:var(--accent);text-decoration:none;font-weight:600;"><i class="fas fa-certificate"></i> Certificate</a>{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="7" style="text-align:center;padding:35px;color:var(--text-muted);"><i class="fas fa-clipboard-list" style="font-size:2.5em;margin-bottom:12px;opacity:0.5;"></i><p>No attempts yet. Begin your first challenge!</p></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% elif page == 'difficulty' %}
+            <h3 class="section-title"><i class="fas fa-layer-group"></i> Select Difficulty for {{ category }}</h3>
+            <div class="difficulty-grid">
+                <div class="difficulty-card very-easy" onclick="startQuiz('Very Easy')"><h3>🌱 Very Easy</h3><p>Foundation concepts & basics</p></div>
+                <div class="difficulty-card easy" onclick="startQuiz('Easy')"><h3>📘 Easy</h3><p>Standard syntax & definitions</p></div>
+                <div class="difficulty-card medium" onclick="startQuiz('Medium')"><h3>⚡ Medium</h3><p>Application & analysis</p></div>
+                <div class="difficulty-card hard" onclick="startQuiz('Hard')"><h3>🔥 Hard</h3><p>Advanced internals & optimization</p></div>
+            </div>
+            {% elif page == 'profile' %}
+            <h3 class="section-title"><i class="fas fa-user-circle"></i> Pro Profile</h3>
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-tasks"></i><h3>{{ stats[0] or 0 }}</h3><p>Total Challenges</p></div>
+                <div class="stat-card"><i class="fas fa-chart-line"></i><h3>{{ "%.1f"|format(stats[1] or 0) }}%</h3><p>Average Accuracy</p></div>
+                <div class="stat-card"><i class="fas fa-trophy"></i><h3>{{ "%.1f"|format(stats[2] or 0) }}%</h3><p>Best Score</p></div>
+                <div class="stat-card"><i class="fas fa-star"></i><h3>{{ stats[3] or 0 }}</h3><p>80%+ Achievements</p></div>
+            </div>
+            <div style="background:var(--card-dark);border:1px solid var(--border);padding:25px;border-radius:16px;margin:25px 0;">
+                <h3 style="margin-bottom:18px;color:var(--accent);font-family:'Cinzel',serif;"><i class="fas fa-bullseye"></i> Performance Analytics</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;">
+                    <div><p style="margin-bottom:5px;"><strong>Python</strong></p><div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div><small style="color:var(--text-muted);">75% Accuracy</small></div>
+                    <div><p style="margin-bottom:5px;"><strong>DBMS</strong></p><div class="progress-bar"><div class="progress-fill" style="width:90%;"></div></div><small style="color:var(--text-muted);">90% Accuracy</small></div>
+                    <div><p style="margin-bottom:5px;"><strong>Web Dev</strong></p><div class="progress-bar"><div class="progress-fill" style="width:60%;"></div></div><small style="color:var(--text-muted);">60% Accuracy</small></div>
+                    <div><p style="margin-bottom:5px;"><strong>Strong Domains</strong></p><p style="color:#10B981;font-weight:600;">DBMS, Python</p></div>
+                    <div><p style="margin-bottom:5px;"><strong>Focus Areas</strong></p><p style="color:#F59E0B;font-weight:600;">Web Dev, Networking</p></div>
+                    <div><p style="margin-bottom:5px;"><strong>Badges Earned</strong></p><p style="color:var(--accent);font-weight:600;"> Quiz Starter, ⚡ Fast Learner</p></div>
+                </div>
+            </div>
+            <h3 class="section-title"><i class="fas fa-clock"></i> Recent Activity</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Domain</th><th>Difficulty</th><th>Score</th><th>Accuracy</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% if recent %}
+                            {% for r in recent %}
+                            <tr>
+                                <td><strong>{{ r[0] }}</strong></td>
+                                <td><span class="diff-badge {{ r[1]|replace(' ', '-')|lower }}">{{ r[1] }}</span></td>
+                                <td>{{ r[2] }}/{{ r[3] }}</td>
+                                <td style="color: {% if r[4] >= 80 %}#10B981{% elif r[4] >= 60 %}#F59E0B{% else %}#EF4444{% endif %}; font-weight: 700;">{{ "%.1f"|format(r[4]) }}%</td>
+                                <td>{{ r[5] }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5" style="text-align:center;padding:25px;color:var(--text-muted);">No activity yet. Take your first challenge!</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% elif page == 'leaderboard' %}
+            <h3 class="section-title" style="text-align:center;"><i class="fas fa-trophy" style="color:var(--accent);"></i> Elite Performers</h3>
+            <div style="max-width:750px;margin:0 auto;">
+                {% for leader in leaders %}
+                <div class="leaderboard-item {% if loop.index <= 3 %}top-3{% endif %}">
+                    <div class="rank {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% elif loop.index == 3 %}bronze{% endif %}">{{ loop.index }}</div>
+                    <div class="user-info"><h4>{{ leader[0] }}</h4><p>{{ leader[1] }} challenges completed</p></div>
+                    <div class="score-badge">{{ "%.1f"|format(leader[2]) }}% avg</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif page == 'materials' %}
+            <h3 class="section-title"><i class="fas fa-book-open"></i> Learning Resources</h3>
+            <p style="color:var(--text-muted);margin-bottom:25px;">Curated premium resources to master your domain before assessment</p>
+            <div class="material-grid">
+                {% for category, items in materials.items() %}
+                <div class="material-category">
+                    <h3><i class="fas fa-folder"></i> {{ category }}</h3>
+                    {% for item in items %}
+                    <div class="material-item" onclick="window.open('{{ item.link }}', '_blank')">
+                        <i class="fas fa-{% if item.type in ['PDF','Book'] %}file-pdf{% elif item.type in ['Video','Course'] %}video{% elif item.type == 'Practice' %}code{% else %}file-alt{% endif %}"></i>
+                        <div><strong>{{ item.title }}</strong><div style="font-size:0.8em;color:var(--text-muted);">{{ item.type }}</div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% elif page == 'quiz' %}
+            <div id="timer" class="timer"><i class="fas fa-clock"></i> <span id="time">0</span>s</div>
+            <h3 class="section-title"><i class="fas fa-question-circle"></i> {{ selected_category }} Challenge <span style="font-size:0.7em;color:var(--text-muted);margin-left:8px;">({{ selected_difficulty }} | 10 Questions)</span></h3>
+            <form method="POST" action="/submit-quiz" id="quizForm">
+                <input type="hidden" name="time_taken" id="timeTaken" value="0">
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                <input type="hidden" name="difficulty" value="{{ selected_difficulty }}">
+                {% for q in questions %}
+                <div class="question-card">
+                    <h3>Q{{ loop.index }}: {{ q[1] }} <span class="diff-badge {{ q[8]|replace(' ', '-')|lower }}">{{ q[8] }}</span></h3>
+                    <input type="hidden" name="correct{{ loop.index }}" value="{{ q[6] }}">
+                    <div class="options">
+                        <label><input type="radio" name="q{{ loop.index }}" value="A" required> <strong>A)</strong> {{ q[2] }}</label>
+                        <label><input type="radio" name="q{{ loop.index }}" value="B"> <strong>B)</strong> {{ q[3] }}</label>
+                        <label><input type="radio" name="q{{ loop.index }}" value="C"> <strong>C)</strong> {{ q[4] }}</label>
+                        <label><input type="radio" name="q{{ loop.index }}" value="D"> <strong>D)</strong> {{ q[5] }}</label>
+                    </div>
+                </div>
+                {% endfor %}
+                <button type="submit" class="pro-btn" style="font-size:1.1em;padding:16px;margin-top:25px;"><i class="fas fa-check-circle"></i> Submit Challenge</button>
+            </form>
+            {% elif page == 'result' %}
+            <div class="result-container">
+                <h3 style="font-family:'Cinzel',serif;font-size:1.8em;color:var(--accent);margin-bottom:10px;"><i class="fas fa-trophy"></i> Challenge Completed!</h3>
+                <div class="result-circle"><div class="score">{{ score }}</div><div class="total">out of {{ total }}</div></div>
+                <div class="grade-badge {% if percentage >= 80 %}excellent{% elif percentage >= 60 %}good{% else %}average{% endif %}">
+                    {% if percentage >= 80 %}  Pro Excellence!{% elif percentage >= 60 %} 👍 Strong Performance!{% else %} 📚 Keep Training!{% endif %}
+                </div>
+                <div class="stats-grid" style="max-width:550px;margin:35px auto;">
+                    <div class="stat-card"><i class="fas fa-percentage"></i><h3>{{ "%.1f"|format(percentage) }}%</h3><p>Accuracy</p></div>
+                    <div class="stat-card"><i class="fas fa-clock"></i><h3>{{ time_taken }}s</h3><p>Time Taken</p></div>
+                    <div class="stat-card"><i class="fas fa-layer-group"></i><h3>{{ selected_difficulty }}</h3><p>Difficulty</p></div>
+                </div>
+                <div style="margin-top:35px;">
+                    {% if percentage >= 80 %}<a href="/certificate/{{ result_id }}" class="pro-btn" style="font-size:1.1em;padding:15px 35px;display:inline-block;width:auto;"><i class="fas fa-certificate"></i> Claim Certificate</a><br>{% endif %}
+                    <a href="/quiz?category={{ selected_category }}&difficulty={{ selected_difficulty }}" class="pro-btn" style="background:var(--card-dark);border:1px solid var(--border);color:var(--text);margin-top:12px;display:inline-block;width:auto;"><i class="fas fa-redo"></i> Retry Challenge</a>
+                    <a href="/dashboard" class="pro-btn" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--accent);margin-top:12px;display:inline-block;width:auto;"><i class="fas fa-home"></i> Back to Dashboard</a>
+                </div>
+            </div>
+            {% elif page == 'certificate' %}
+            <div class="certificate-container">
+                <div class="certificate-header"><i class="fas fa-graduation-cap"></i></div>
+                <div class="certificate-title">Certificate of Excellence</div>
+                <div class="certificate-body">This certifies that<br><div class="certificate-name">{{ username }}</div>has successfully conquered the<br><strong>{{ result[3] }} {{ result[4] }} Challenge</strong><br>with a distinguished score of</div>
+                <div class="certificate-score">{{ "%.1f"|format(result[5]) }}% ({{ result[1] }}/{{ result[2] }})</div>
+                <div class="certificate-date"><i class="fas fa-calendar"></i> Awarded on {{ result[6] }}</div>
+                <div style="margin-top:35px;">
+                    <button onclick="window.print()" class="pro-btn" style="font-size:1.1em;padding:15px 35px;display:inline-block;width:auto;"><i class="fas fa-print"></i> Print Certificate</button>
+                    <a href="/dashboard" class="pro-btn" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--accent);margin-top:12px;display:inline-block;width:auto;"><i class="fas fa-home"></i> Back to Dashboard</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <script>
+        function toggleForm() {
+            document.getElementById('login-form').classList.toggle('hidden');
+            document.getElementById('register-form').classList.toggle('hidden');
+        }
+        function goToDifficulty(category) {
+            window.location.href = `/select-difficulty/${encodeURIComponent(category)}`;
+        }
+        function startQuiz(difficulty) {
+            const category = '{{ category }}';
+            window.location.href = `/quiz?category=${encodeURIComponent(category)}&difficulty=${encodeURIComponent(difficulty)}`;
+        }
+        {% if page == 'quiz' %}
+        let seconds = 0;
+        const timerEl = document.getElementById('time');
+        const timeTakenEl = document.getElementById('timeTaken');
+        const timerInterval = setInterval(() => {
+            seconds++;
+            timerEl.textContent = seconds;
+            timeTakenEl.value = seconds;
+            if(seconds > 300) document.getElementById('timer').classList.add('warning');
+        }, 1000);
+        document.getElementById('quizForm').addEventListener('submit', () => clearInterval(timerInterval));
+        {% endif %}
+    </script>
+</body>
+</html>
